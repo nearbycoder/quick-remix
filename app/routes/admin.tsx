@@ -13,6 +13,8 @@ export let loader = () => {
 
 export default function Admin() {
   let posts = useLoaderData<Post[]>();
+
+  console.log(posts);
   return (
     <div className="admin">
       <nav>
