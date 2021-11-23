@@ -1,22 +1,21 @@
 import React from 'react';
-import { Form, useTransition } from 'remix';
+import { Form, useTransition, useActionData } from 'remix';
 import type { FormMethod } from 'remix';
 import type { Post } from '~/post';
 
 export default function PostForm({
   method,
-  errors,
   post,
   submitText,
   submittingText,
 }: {
   method: FormMethod;
-  errors: Record<string, boolean>;
   post?: Post;
   submitText: string;
   submittingText: string;
 }) {
   let transition = useTransition();
+  let errors = useActionData();
 
   return (
     <Form method={method}>

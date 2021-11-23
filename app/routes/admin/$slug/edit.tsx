@@ -1,11 +1,4 @@
-import {
-  useActionData,
-  useLoaderData,
-  Form,
-  redirect,
-  useTransition,
-  Link,
-} from 'remix';
+import { useLoaderData, redirect } from 'remix';
 import type { ActionFunction, LoaderFunction } from 'remix';
 import { updatePost, getPost } from '~/post';
 import invariant from 'tiny-invariant';
@@ -39,15 +32,12 @@ export let loader: LoaderFunction = async ({ params }) => {
 };
 
 export default function EditPost() {
-  let errors = useActionData();
-
   let post = useLoaderData();
 
   return (
     <PostForm
       method="patch"
       post={post}
-      errors={errors}
       submitText="Update Post"
       submittingText="Updating..."
     />

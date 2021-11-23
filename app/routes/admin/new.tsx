@@ -1,4 +1,4 @@
-import { useActionData, redirect } from 'remix';
+import { redirect } from 'remix';
 import type { ActionFunction } from 'remix';
 import { createPost } from '~/post';
 import invariant from 'tiny-invariant';
@@ -29,12 +29,9 @@ export let action: ActionFunction = async ({ request }) => {
 };
 
 export default function NewPost() {
-  let errors = useActionData();
-
   return (
     <PostForm
       method="post"
-      errors={errors}
       submitText="Create Post"
       submittingText="Creating..."
     />
