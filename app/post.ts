@@ -49,18 +49,21 @@ export async function getPost(slug: string) {
 export async function getPosts() {
   let dir = await fs.readdir(postsPath);
   return Promise.all(
-    dir.map(async (filename) => {
-      let file = await fs.readFile(path.join(postsPath, filename));
-      let { attributes } = parseFrontMatter(file.toString());
-      invariant(
-        isValidPostAttributes(attributes),
-        `${filename} has bad meta data!`
-      );
-      return {
-        slug: filename.replace(/\.md$/, ''),
-        title: attributes.title,
-      };
-    })
+    dir
+      .map(async (filename) => {
+        if (filename === '.keep') return;
+        let file = await fs.readFile(path.join(postsPath, filename));
+        let { attributes } = parseFrontMatter(file.toString());
+        invariant(
+          isValidPostAttributes(attributes),
+          `${filename} has bad meta data!`
+        );
+        return {
+          slug: filename.replace(/\.md$/, ''),
+          title: attributes.title,
+        };
+      })
+      .filter((p) => !p)
   );
 }
 
