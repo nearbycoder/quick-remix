@@ -9,8 +9,11 @@ import {
   ScrollRestoration,
   useCatch,
   useLocation,
+  useLoaderData,
+  Form,
 } from 'remix';
-import type { LinksFunction } from 'remix';
+import type { LinksFunction, LoaderFunction } from 'remix';
+import { authenticator } from '~/services/auth.server';
 
 import deleteMeRemixStyles from '~/styles/demos/remix.css';
 import globalStylesUrl from '~/styles/global.css';
@@ -42,14 +45,21 @@ export let links: LinksFunction = () => {
  * component for your app.
  */
 export default function App() {
+  const user = useLoaderData();
   return (
     <Document>
-      <Layout>
+      <Layout user={user}>
         <Outlet />
       </Layout>
     </Document>
   );
 }
+
+export let loader: LoaderFunction = async ({ request }) => {
+  let user = await authenticator.isAuthenticated(request);
+
+  return user;
+};
 
 function Document({
   children,
@@ -78,7 +88,10 @@ function Document({
   );
 }
 
-function Layout({ children }: React.PropsWithChildren<{}>) {
+function Layout({
+  children,
+  user,
+}: React.PropsWithChildren<{ user?: { id: string; email: string } }>) {
   return (
     <div className="remix-app">
       <header className="remix-app__header">
@@ -88,21 +101,29 @@ function Layout({ children }: React.PropsWithChildren<{}>) {
           </Link>
           <nav aria-label="Main navigation" className="remix-app__header-nav">
             <ul>
-              <li>
-                <Link to="/admin">Admin</Link>
-              </li>
+              {user?.id ? (
+                <>
+                  <li>Logged in as {user?.email}</li>
+
+                  <li>
+                    <Link to="/admin">Admin</Link>
+                  </li>
+                </>
+              ) : (
+                <form action="/auth/github" method="post">
+                  <button>Login with GitHub</button>
+                </form>
+              )}
               <li>
                 <Link to="/posts">Posts</Link>
               </li>
-              <li>
-                <Link to="/">Home</Link>
-              </li>
-              <li>
-                <a href="https://remix.run/docs">Remix Docs</a>
-              </li>
-              <li>
-                <a href="https://github.com/remix-run/remix">GitHub</a>
-              </li>
+              {user?.id && (
+                <li>
+                  <Form action="/auth/logout" method="post">
+                    <button type="submit">Logout</button>
+                  </Form>
+                </li>
+              )}
             </ul>
           </nav>
         </div>
